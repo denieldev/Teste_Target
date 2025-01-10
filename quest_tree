@@ -1,0 +1,39 @@
+const fs = require('fs'); // Importa o módulo de sistema de arquivos (File System)
+
+// Função para calcular os valores requisitados
+function calcularFaturamento(faturamento) {
+    const diasValidos = faturamento.filter(item => item.valor > 0);
+
+    const menorValor = Math.min(...diasValidos.map(item => item.valor));
+    const maiorValor = Math.max(...diasValidos.map(item => item.valor));
+
+    const somaFaturamento = diasValidos.reduce((acc, item) => acc + item.valor, 0);
+    const mediaFaturamento = somaFaturamento / diasValidos.length;
+
+    const diasAcimaDaMedia = diasValidos.filter(item => item.valor > mediaFaturamento).length;
+
+    return {
+        menorValor,
+        maiorValor,
+        mediaFaturamento: mediaFaturamento.toFixed(2),
+        diasAcimaDaMedia
+    };
+}
+
+// Lê o arquivo JSON
+fs.readFile('faturamento_mensal.json', 'utf8', (err, data) => {
+    if (err) {
+        console.error('Erro ao ler o arquivo JSON:', err);
+        return;
+    }
+
+    // Converte os dados do JSON para um objeto JavaScript
+    const faturamento = JSON.parse(data);
+
+    // Calcula os valores e exibe os resultados
+    const resultado = calcularFaturamento(faturamento);
+    console.log("Menor valor de faturamento:", resultado.menorValor);
+    console.log("Maior valor de faturamento:", resultado.maiorValor);
+    console.log("Média de faturamento mensal (dias úteis):", resultado.mediaFaturamento);
+    console.log("Dias com faturamento acima da média:", resultado.diasAcimaDaMedia);
+});
